@@ -1,4 +1,4 @@
-## 5.7.0
+## 5.6.0
 
 - **Flutter**: Minimum Flutter version updated to `>=3.35.0` (compatible with Flutter 3.35.x).
 - **Docs**: README updated with pub.dev badge and links; GitHub links updated to `jayfinava/twitter_sign_in`; example code updated (e.g. `FlatButton` → `TextButton`, `const` usage).
