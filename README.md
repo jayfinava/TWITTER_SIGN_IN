@@ -1,57 +1,51 @@
 # twitter_sign_in
 
-![Pub Version](https://img.shields.io/pub/v/twitter_sign_in?color=blue)
+[![Pub Version](https://img.shields.io/pub/v/twitter_sign_in?color=blue)](https://pub.dev/packages/twitter_sign_in)  
+**📦 Live on pub.dev:** [pub.dev/packages/twitter_sign_in](https://pub.dev/packages/twitter_sign_in)
 
-Flutter Twitter Login Plugin
+Flutter Twitter Login Plugin — cross-platform Twitter (X) sign-in with OAuth 1.0a and OAuth 2.0 PKCE.
 
-# Requirements
+## Requirements
 
-- Dart sdk: ">=2.14.0 <4.0.0"
-- flutter: ">=3.3.0"
-- Android: minSdkVersion 17 and add support for androidx
-- iOS: --ios-language swift, Xcode version >= 11
+- Dart SDK: `>=2.14.0 <4.0.0`
+- Flutter: `>=3.35.0` (tested with Flutter 3.35.x)
+- Android: minSdkVersion 17, AndroidX
+- iOS: Swift, Xcode >= 11
 
 ## Twitter Configuration
 
 [Twitter Developer](https://developer.twitter.com/)
 
-required to create TwitterApp.  
-this plugin is need Callback URLs.
+Create a Twitter App and configure **Callback URLs** for this plugin.
 
-please register a different callback URL on Twitter Developers.
+Register a callback URL on Twitter Developer (e.g. `app_name://`).
 
-```
-app_name://
-```
-
-If the API is not set to get email, email may be null.
-If you want to use email, turn on Request email address from users.
+If the API is not set to get email, `email` may be null. To use email, enable **Request email address from users** in the app settings.
 
 ## Android Configuration
 
 ### Add intent filters for incoming links
 
-[/example/android/app/src/main/AndroidManifest.xm](https://github.com/jayfinava-benzatine/twitter_sign_in/blob/master/example/android/app/src/main/AndroidManifest.xml)
+See [example/android/app/src/main/AndroidManifest.xml](https://github.com/jayfinava/twitter_sign_in/blob/master/example/android/app/src/main/AndroidManifest.xml) in the repo.
 
-You need to replace the scheme with a Callback URLs.
+Replace the scheme with your Callback URL:
 
 ```xml
 <intent-filter>
   <action android:name="android.intent.action.VIEW" />
   <category android:name="android.intent.category.DEFAULT" />
   <category android:name="android.intent.category.BROWSABLE" />
-  <!-- Accepts URIs that begin with "example://gizmos” -->
-  <!-- Registered Callback URLs in TwitterApp -->
+  <!-- Use the scheme registered as Callback URL in your Twitter App -->
   <data android:scheme="example"
-        android:host="gizmos" /> <!-- host is option -->
+        android:host="gizmos" /> <!-- host is optional -->
 </intent-filter>
 ```
 
-### Supporting the new Android plugins APIs
+### Flutter embedding (pre 1.12 projects)
 
-If you flutter created your project prior to version 1.12, you need to make sure to update your project in order to use the new Java Embedding API.  
-Make use you have flutter_embedding v2 enabled. Add the following code on the manifest file inside <application> tag to enable embedding.  
-Flutter wiki: [Upgrading pre 1.12 Android projects.](https://github.com/flutter/flutter/wiki/Upgrading-pre-1.12-Android-projects)
+If your project was created before Flutter 1.12, ensure Flutter embedding v2 is enabled. Add inside the `<application>` tag:
+
+[Upgrading pre 1.12 Android projects](https://github.com/flutter/flutter/wiki/Upgrading-pre-1.12-Android-projects)
 
 ```xml
 <meta-data
@@ -61,11 +55,11 @@ Flutter wiki: [Upgrading pre 1.12 Android projects.](https://github.com/flutter/
 
 ## iOS Configuration
 
-### Add URLScheme
+### Add URL Scheme
 
-[/example/ios/Runner/Info.plist](https://github.com/jayfinava-benzatine/twitter_sign_in/blob/master/example/ios/Runner/Info.plist#L21)
+See [example/ios/Runner/Info.plist](https://github.com/jayfinava/twitter_sign_in/blob/master/example/ios/Runner/Info.plist) in the repo.
 
-You need to replace the example with a Callback URLs.
+Replace `example` with your Callback URL scheme:
 
 ```xml
 <key>CFBundleURLTypes</key>
@@ -77,36 +71,37 @@ You need to replace the example with a Callback URLs.
     <string></string>
     <key>CFBundleURLSchemes</key>
     <array>
-      <!-- Registered Callback URLs in TwitterApp -->
+      <!-- Registered Callback URL in Twitter App -->
       <string>example</string>
     </array>
   </dict>
 </array>
 ```
 
-# Example code
+## Example
 
-See the example directory for a complete sample app using twitter_sign_in.
+A full sample app is in the [example](https://github.com/jayfinava/twitter_sign_in/tree/master/example) directory.
 
-[example](https://github.com/jayfinava-benzatine/twitter_sign_in/tree/master/example)
+## Usage
 
-# Usage
+Add `twitter_sign_in` to your app’s `pubspec.yaml`:
 
-To use this plugin, add `twitter_sign_in` as a [dependency in your pubspec.yaml file.](https://flutter.dev/platform-plugins/)
+- **pub.dev:** [pub.dev/packages/twitter_sign_in#-installing-tab](https://pub.dev/packages/twitter_sign_in#-installing-tab)  
+- [Flutter platform plugins](https://flutter.dev/platform-plugins/)
 
 ### Example
 
 ```dart
 import 'package:flutter/material.dart';
-import 'package:twitter_sign_in/twitter_sign_in.dart';
+import 'package:twitter_sign_in/twitter_login.dart';
 
 void main() {
-  runApp(MyApp());
+  runApp(const MyApp());
 }
 
 class MyApp extends StatefulWidget {
   @override
-  _MyAppState createState() => _MyAppState();
+  State<MyApp> createState() => _MyAppState();
 }
 
 class _MyAppState extends State<MyApp> {
@@ -118,20 +113,14 @@ class _MyAppState extends State<MyApp> {
           title: const Text('Twitter Login App'),
         ),
         body: Center(
-          child: FlatButton(
-            child: Text('Login With Twitter'),
+          child: TextButton(
             onPressed: () async {
               final twitterLogin = TwitterLogin(
-                // Consumer API keys
                 apiKey: 'xxxx',
-                // Consumer API Secret keys
                 apiSecretKey: 'xxxx',
-                // Registered Callback URLs in TwitterApp
-                // Android is a deeplink
-                // iOS is a URLScheme
                 redirectURI: 'example://',
               );
-              final authResult = twitterLogin.login();
+              final authResult = await twitterLogin.login();
               switch (authResult.status) {
                 case TwitterLoginStatus.loggedIn:
                   // success
@@ -144,6 +133,7 @@ class _MyAppState extends State<MyApp> {
                   break;
               }
             },
+            child: const Text('Login With Twitter'),
           ),
         ),
       ),
@@ -151,3 +141,9 @@ class _MyAppState extends State<MyApp> {
   }
 }
 ```
+
+## Links
+
+- **Package & docs:** [pub.dev/packages/twitter_sign_in](https://pub.dev/packages/twitter_sign_in)
+- **Source:** [github.com/jayfinava/twitter_sign_in](https://github.com/jayfinava/twitter_sign_in)
+- **Issues:** [github.com/jayfinava/twitter_sign_in/issues](https://github.com/jayfinava/twitter_sign_in/issues)

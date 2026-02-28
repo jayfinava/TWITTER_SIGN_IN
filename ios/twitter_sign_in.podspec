@@ -5,7 +5,7 @@ Pod::Spec.new do |s|
   s.description      = <<-DESC
 A Flutter plugin for signing in with Twitter.
                        DESC
-  s.homepage         = 'https://github.com/jayfinava-benzatine/twitter_sign_in'
+  s.homepage         = 'https://github.com/jayfinava/twitter_sign_in'
   s.license          = { :file => '../LICENSE' }
   s.author           = { 'Your Company' => 'email@example.com' }
   s.source           = { :path => '.' }
