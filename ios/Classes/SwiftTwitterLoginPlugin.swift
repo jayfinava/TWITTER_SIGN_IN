@@ -72,6 +72,25 @@ public class SwiftTwitterLoginPlugin: NSObject, FlutterPlugin, ASWebAuthenticati
     
     @available(iOS 12.0, *)
     public func presentationAnchor(for session: ASWebAuthenticationSession) -> ASPresentationAnchor {
-        return UIApplication.shared.delegate!.window!!
+        // Flutter and iOS 13+ may not set delegate.window; use key window from scene or windows.
+        if let window = UIApplication.shared.delegate?.window as? UIWindow {
+            return window
+        }
+        if #available(iOS 13.0, *) {
+            let scene = UIApplication.shared.connectedScenes
+                .compactMap { $0 as? UIWindowScene }
+                .first { $0.activationState == .foregroundActive }
+            if let window = scene?.windows.first(where: { $0.isKeyWindow }) {
+                return window
+            }
+            if let window = scene?.windows.first {
+                return window
+            }
+        }
+        if let window = UIApplication.shared.windows.first(where: { $0.isKeyWindow })
+            ?? UIApplication.shared.windows.first {
+            return window
+        }
+        fatalError("No window available for ASWebAuthenticationSession presentation.")
     }
 }
