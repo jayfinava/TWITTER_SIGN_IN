@@ -1,6 +1,7 @@
 name: twitter_sign_in_example
 description: Demonstrates how to use the twitter_sign_in plugin.
 publish_to: "none"
+version: 1.0.0+1
 
 environment:
   sdk: ">=2.14.0 <4.0.0"

@@ -26,42 +26,62 @@ public class SwiftTwitterLoginPlugin: NSObject, FlutterPlugin, ASWebAuthenticati
     }
 
     public func authentication(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
-        let args = call.arguments as! NSDictionary
-        let url = args["url"] as! String
+        guard let args = call.arguments as? NSDictionary,
+              let urlString = args["url"] as? String,
+              let authURL = URL(string: urlString) else {
+            result(FlutterError(
+                code: "INVALID_ARGUMENTS",
+                message: "Missing or invalid url for authentication",
+                details: nil
+            ))
+            return
+        }
         let urlScheme = args["redirectURL"] as? String
-        
+
         // iOS12以降
         if #available(iOS 12.0, *) {
             var authSession: ASWebAuthenticationSession?
             authSession = ASWebAuthenticationSession(
-                url: URL(string: url)!,
+                url: authURL,
                 callbackURLScheme: urlScheme
-            ) { url, error in
+            ) { url, _ in
                 result(url?.absoluteString)
-                authSession!.cancel()
+                authSession?.cancel()
                 self.session = nil
             }
             self.session = authSession
             if #available(iOS 13.0, *) {
                 authSession?.presentationContextProvider = self
             }
-            if !authSession!.start() {
-            // TODO: failed
+            guard authSession?.start() == true else {
+                self.session = nil
+                result(FlutterError(
+                    code: "AUTH_SESSION_START_FAILED",
+                    message: "Failed to start ASWebAuthenticationSession",
+                    details: nil
+                ))
+                return
             }
         // iOS11のみ
         } else if #available(iOS 11.0, *) {
             var authSession: SFAuthenticationSession?
             authSession = SFAuthenticationSession(
-                url: URL(string: url)!,
+                url: authURL,
                 callbackURLScheme: urlScheme
-            ) { url, error in
+            ) { url, _ in
                 result(url?.absoluteString)
-                authSession!.cancel()
+                authSession?.cancel()
                 self.session = nil
             }
             self.session = authSession
-            if !authSession!.start() {
-            // TODO: failed
+            guard authSession?.start() == true else {
+                self.session = nil
+                result(FlutterError(
+                    code: "AUTH_SESSION_START_FAILED",
+                    message: "Failed to start SFAuthenticationSession",
+                    details: nil
+                ))
+                return
             }
         } else {
             // iOS10以前は未対応
@@ -69,28 +89,41 @@ public class SwiftTwitterLoginPlugin: NSObject, FlutterPlugin, ASWebAuthenticati
             return
         }
     }
-    
+
+    private static func presentationWindow() -> UIWindow? {
+        if #available(iOS 13.0, *) {
+            let scenes = UIApplication.shared.connectedScenes
+                .compactMap { $0 as? UIWindowScene }
+                .sorted { lhs, rhs in
+                    let lhsActive = lhs.activationState == .foregroundActive
+                    let rhsActive = rhs.activationState == .foregroundActive
+                    if lhsActive != rhsActive { return lhsActive }
+                    return false
+                }
+            for scene in scenes {
+                if let window = scene.windows.first(where: { $0.isKeyWindow }) {
+                    return window
+                }
+                if let window = scene.windows.first {
+                    return window
+                }
+            }
+        }
+        if let window = UIApplication.shared.delegate?.window ?? nil {
+            return window
+        }
+        if let window = UIApplication.shared.keyWindow {
+            return window
+        }
+        return UIApplication.shared.windows.first(where: { $0.isKeyWindow })
+            ?? UIApplication.shared.windows.first
+    }
+
     @available(iOS 12.0, *)
     public func presentationAnchor(for session: ASWebAuthenticationSession) -> ASPresentationAnchor {
-        // Flutter and iOS 13+ may not set delegate.window; use key window from scene or windows.
-        if let window = UIApplication.shared.delegate?.window as? UIWindow {
-            return window
+        guard let window = Self.presentationWindow() else {
+            fatalError("No window available for ASWebAuthenticationSession presentation.")
         }
-        if #available(iOS 13.0, *) {
-            let scene = UIApplication.shared.connectedScenes
-                .compactMap { $0 as? UIWindowScene }
-                .first { $0.activationState == .foregroundActive }
-            if let window = scene?.windows.first(where: { $0.isKeyWindow }) {
-                return window
-            }
-            if let window = scene?.windows.first {
-                return window
-            }
-        }
-        if let window = UIApplication.shared.windows.first(where: { $0.isKeyWindow })
-            ?? UIApplication.shared.windows.first {
-            return window
-        }
-        fatalError("No window available for ASWebAuthenticationSession presentation.")
+        return window
     }
 }

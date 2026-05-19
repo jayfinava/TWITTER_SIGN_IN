@@ -1,3 +1,9 @@
+## 5.7.0
+
+- **Fix (iOS)**: Resolved a crash in `SwiftTwitterLoginPlugin` when presenting `ASWebAuthenticationSession` on iOS 13+ (`Fatal error: Unexpectedly found nil while unwrapping an Optional value`). The plugin now resolves the presentation window via the Flutter registrar and scene-based fallbacks instead of force-unwrapping `UIApplication.shared.delegate!.window!!`.
+- **Improvement (iOS)**: Safer argument validation and `FlutterError` responses when the auth URL is invalid or the web authentication session fails to start.
+- **Example (iOS)**: Fixed `example/ios/Podfile` — set `platform :ios, '13.0'` and removed the non-existent `RunnerTests` CocoaPods target that caused `pod install` to fail.
+
 ## 5.6.0
 
 - **Flutter**: Minimum Flutter version updated to `>=3.35.0` (compatible with Flutter 3.35.x).

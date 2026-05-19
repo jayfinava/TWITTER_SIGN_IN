@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name             = 'twitter_sign_in'
-  s.version          = '5.0.2'
+  s.version          = '5.7.0'
   s.summary          = 'Flutter Twitter Sign In Plugin'
   s.description      = <<-DESC
 A Flutter plugin for signing in with Twitter.

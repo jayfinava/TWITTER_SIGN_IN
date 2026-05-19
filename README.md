@@ -5,12 +5,19 @@
 
 Flutter Twitter Login Plugin — cross-platform Twitter (X) sign-in with OAuth 1.0a and OAuth 2.0 PKCE.
 
+## What's new in 5.7.0
+
+- **iOS**: Fixes a crash during Twitter login on iOS 13+ when `ASWebAuthenticationSession` could not find a valid app window (common in Flutter apps).
+- **Example**: `pod install` in the example app no longer fails on missing `RunnerTests` or unspecified iOS platform.
+
+See [CHANGELOG.md](CHANGELOG.md) for full release history.
+
 ## Requirements
 
 - Dart SDK: `>=2.14.0 <4.0.0`
 - Flutter: `>=3.35.0` (tested with Flutter 3.35.x)
 - Android: minSdkVersion 17, AndroidX
-- iOS: Swift, Xcode >= 11
+- iOS: 13.0+ (example app), Swift, Xcode >= 11
 
 ## Twitter Configuration
 
@@ -54,6 +61,14 @@ If your project was created before Flutter 1.12, ensure Flutter embedding v2 is 
 ```
 
 ## iOS Configuration
+
+After adding the plugin, run from your app directory:
+
+```bash
+cd ios && pod install && cd ..
+```
+
+If you use a custom `Podfile`, set `platform :ios, '13.0'` (or higher) and ensure you do not reference Xcode targets that are not present in your project (e.g. `RunnerTests`).
 
 ### Add URL Scheme
 
@@ -142,8 +157,28 @@ class _MyAppState extends State<MyApp> {
 }
 ```
 
+## Publishing (maintainers)
+
+From the package root, verify the package before publishing to pub.dev:
+
+```bash
+flutter pub get
+dart analyze
+flutter test
+dart pub publish --dry-run
+```
+
+When ready:
+
+```bash
+dart pub publish
+```
+
+Tag the release in git (e.g. `v5.7.0`) after a successful publish.
+
 ## Links
 
 - **Package & docs:** [pub.dev/packages/twitter_sign_in](https://pub.dev/packages/twitter_sign_in)
+- **Changelog:** [CHANGELOG.md](CHANGELOG.md)
 - **Source:** [github.com/jayfinava/twitter_sign_in](https://github.com/jayfinava/twitter_sign_in)
 - **Issues:** [github.com/jayfinava/twitter_sign_in/issues](https://github.com/jayfinava/twitter_sign_in/issues)
