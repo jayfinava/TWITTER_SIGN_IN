@@ -35,11 +35,20 @@ public class ChromeCustomTabsActivity extends Activity implements MethodChannel.
 
         setContentView(R.layout.chrome_custom_tab);
 
-        Bundle bundle = getIntent().getExtras();
-        assert bundle != null;
+        // Android may restore this activity after process death without extras,
+        // or with a managerId that no longer exists in the static shared map.
+        Bundle bundle = getIntent() != null ? getIntent().getExtras() : null;
+        if (bundle == null) {
+            finish();
+            return;
+        }
 
         String managerId = bundle.getString("managerId");
-        manager = ChromeSafariBrowserManager.shared.get(managerId);
+        manager = managerId != null ? ChromeSafariBrowserManager.shared.get(managerId) : null;
+        if (manager == null || manager.plugin == null) {
+            finish();
+            return;
+        }
 
         // Create a methodChannel for each Activity.
         id = bundle.getString("id");
@@ -47,6 +56,10 @@ public class ChromeCustomTabsActivity extends Activity implements MethodChannel.
         channel.setMethodCallHandler(this);
 
         final String url = bundle.getString("url");
+        if (url == null || url.isEmpty()) {
+            finish();
+            return;
+        }
 
         final ChromeCustomTabsActivity chromeCustomTabsActivity = this;
 
@@ -90,13 +103,17 @@ public class ChromeCustomTabsActivity extends Activity implements MethodChannel.
     @Override
     protected void onStart() {
         super.onStart();
-        helper.bindCustomTabsService(this);
+        if (helper != null) {
+            helper.bindCustomTabsService(this);
+        }
     }
 
     @Override
     protected void onStop() {
         super.onStop();
-        helper.unbindCustomTabsService(this);
+        if (helper != null) {
+            helper.unbindCustomTabsService(this);
+        }
     }
 
     @Override
@@ -108,14 +125,18 @@ public class ChromeCustomTabsActivity extends Activity implements MethodChannel.
     }
 
     public void dispose() {
-        channel.setMethodCallHandler(null);
+        if (channel != null) {
+            channel.setMethodCallHandler(null);
+        }
         manager = null;
     }
 
     public void close() {
         session = null;
         finish();
-        Map<String, Object> obj = new HashMap<>();
-        channel.invokeMethod("onClose", obj);
+        if (channel != null) {
+            Map<String, Object> obj = new HashMap<>();
+            channel.invokeMethod("onClose", obj);
+        }
     }
 }
