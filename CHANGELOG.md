@@ -1,3 +1,8 @@
+## 5.7.1
+
+- **Fix (Android)**: Prevent fatal crash in `ChromeCustomTabsActivity.onCreate` when Android restores the activity after process death with null intent extras, or when `ChromeSafariBrowserManager` is no longer in the static shared map (`NullPointerException` on `Bundle.getString` / `manager.plugin`).
+- **Improvement (Android)**: Mark `ChromeCustomTabsActivity` as `noHistory` / `excludeFromRecents` / `exported=false` so the system is less likely to restore a stale Custom Tabs host activity.
+
 ## 5.7.0
 
 - **Fix (iOS)**: Resolved a crash in `SwiftTwitterLoginPlugin` when presenting `ASWebAuthenticationSession` on iOS 13+ (`Fatal error: Unexpectedly found nil while unwrapping an Optional value`). The plugin now resolves the presentation window via the Flutter registrar and scene-based fallbacks instead of force-unwrapping `UIApplication.shared.delegate!.window!!`.

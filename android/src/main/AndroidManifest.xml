@@ -4,7 +4,10 @@
     <application>
 
         <activity
-            android:name="com.maru.twitter_login.chrome_custom_tabs.ChromeCustomTabsActivity"/>
+            android:name="com.maru.twitter_login.chrome_custom_tabs.ChromeCustomTabsActivity"
+            android:excludeFromRecents="true"
+            android:noHistory="true"
+            android:exported="false"/>
     </application>
 
     <queries>
