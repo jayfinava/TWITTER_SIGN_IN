@@ -5,10 +5,10 @@
 
 Flutter Twitter Login Plugin — cross-platform Twitter (X) sign-in with OAuth 1.0a and OAuth 2.0 PKCE.
 
-## What's new in 5.7.0
+## What's new in 5.7.1
 
-- **iOS**: Fixes a crash during Twitter login on iOS 13+ when `ASWebAuthenticationSession` could not find a valid app window (common in Flutter apps).
-- **Example**: `pod install` in the example app no longer fails on missing `RunnerTests` or unspecified iOS platform.
+- **Android**: Fixes a fatal crash in `ChromeCustomTabsActivity` when Android restores Twitter login Custom Tabs after process death (`NullPointerException` on null intent extras / missing browser manager).
+- **Android**: Custom Tabs host activity is now `noHistory` / `excludeFromRecents` / `exported=false` to reduce stale activity restores.
 
 See [CHANGELOG.md](CHANGELOG.md) for full release history.
 
@@ -174,7 +174,7 @@ When ready:
 dart pub publish
 ```
 
-Tag the release in git (e.g. `v5.7.0`) after a successful publish.
+Tag the release in git (e.g. `v5.7.1`) after a successful publish.
 
 ## Links
 
